@@ -35,8 +35,8 @@ void setup()
   delay(1250);
   M5.begin();
   M5.Lcd.fillScreen(BLACK);
-  M5.Lcd.setCursor(0, 0, 2);
-
+  M5.Lcd.setCursor(0, 0,2);
+  M5.Lcd.setTextSize(1);
   esp_chip_info_t ci;
   esp_chip_info(&ci);
   Serial.println("chip model " + String(ci.model));
@@ -46,15 +46,17 @@ void setup()
   char macBuf[20]; //xx-xx-xx-xx-xx-xx
   sprintf(macBuf, "%x-%x-%x-%x-%x-%x", (unsigned int)mac[0], (unsigned int)mac[1], (unsigned int)mac[2], (unsigned int)mac[3], (unsigned int)mac[4], (unsigned int)mac[5]);
   macStr = String(macBuf);
+  M5.Lcd.setTextSize(2);
   Serial.println("MAC: " + macStr);
   M5.Lcd.println("MAC: " + macStr);
-  Serial.println("Project version: " + String(VERSION));
-  M5.Lcd.println("Project version: " + String(VERSION));
-  Serial.println("Sketch MD5 " + EspClass().getSketchMD5());
-  M5.Lcd.println("Sketch MD5 " + EspClass().getSketchMD5());
-  Serial.println("Build timestamp:" + String(BUILD_TIMESTAMP));
-  M5.Lcd.println("Build timestamp:" + String(BUILD_TIMESTAMP));
-  M5.Lcd.println("configured SSID" + ssid);
+  Serial.println("Version: " + String(VERSION));
+  M5.Lcd.println("Version: " + String(VERSION));
+  M5.Lcd.setTextSize(1);
+  Serial.println("MD5: " + EspClass().getSketchMD5());
+  M5.Lcd.println("MD5: " + EspClass().getSketchMD5());
+  Serial.println("Build timestamp: " + String(BUILD_TIMESTAMP));
+  M5.Lcd.println("Build timestamp:  " + String(BUILD_TIMESTAMP));
+  M5.Lcd.println("configured SSID: " + String(ssid));
 
   WiFi.begin(ssid, password);
   WiFi.setHostname("co2fota");
