@@ -34,6 +34,28 @@ void setup()
 
   delay(1250);
   M5.begin();
+  M5.Lcd.fillScreen(BLACK);
+  M5.Lcd.setCursor(0, 0, 2);
+
+  esp_chip_info_t ci;
+  esp_chip_info(&ci);
+  Serial.println("chip model " + String(ci.model));
+  Serial.println("chip revision " + String(ci.revision));
+  uint8_t mac[6];
+  esp_efuse_mac_get_default(mac);
+  char macBuf[20]; //xx-xx-xx-xx-xx-xx
+  sprintf(macBuf, "%x-%x-%x-%x-%x-%x", (unsigned int)mac[0], (unsigned int)mac[1], (unsigned int)mac[2], (unsigned int)mac[3], (unsigned int)mac[4], (unsigned int)mac[5]);
+  macStr = String(macBuf);
+  Serial.println("MAC: " + macStr);
+  M5.Lcd.println("MAC: " + macStr);
+  Serial.println("Project version: " + String(VERSION));
+  M5.Lcd.println("Project version: " + String(VERSION));
+  Serial.println("Sketch MD5 " + EspClass().getSketchMD5());
+  M5.Lcd.println("Sketch MD5 " + EspClass().getSketchMD5());
+  Serial.println("Build timestamp:" + String(BUILD_TIMESTAMP));
+  M5.Lcd.println("Build timestamp:" + String(BUILD_TIMESTAMP));
+  M5.Lcd.println("configured SSID" + ssid);
+
   WiFi.begin(ssid, password);
   WiFi.setHostname("co2fota");
   WiFi.setAutoReconnect(true);
@@ -48,23 +70,11 @@ void setup()
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
   Serial.println();
 
-  esp_chip_info_t ci;
-  esp_chip_info(&ci);
-  Serial.println("chip model "+String(ci.model));
-  Serial.println("chip revision "+String(ci.revision));
-  uint8_t mac[6];
-  esp_efuse_mac_get_default(mac);
-  char macBuf[20]; //xx-xx-xx-xx-xx-xx
-  sprintf(macBuf,"%x-%x-%x-%x-%x-%x",(unsigned int)mac[0],(unsigned int)mac[1],(unsigned int)mac[2],(unsigned int)mac[3],(unsigned int)mac[4],(unsigned int)mac[5]);
-  macStr=String(macBuf);
-  Serial.println("MAC: "+macStr);
-  Serial.println("Project version: " + String(VERSION));
-  Serial.println("Sketch MD5 " + EspClass().getSketchMD5());
-  Serial.println("Build timestamp:" + String(BUILD_TIMESTAMP));
-  Serial.println("setup end\n");
+  Serial.println("setup complete\n");
+  M5.Lcd.println("setup complete\n");
+  delay(5000);
 }
- 
- 
+
 void pollFOTAUpdate(String host, int port, String uri)
 {
   static long int lastPoll = 0;
@@ -209,12 +219,12 @@ void pollFOTAUpdate(String host, int port, String uri)
   } */
 
   http.end();
-   
 }
 
 void loop()
 {
   Serial.println("-- V4 --");
+
   //pollFOTAUpdate("co2ampel.kgbvax.net",443,"/firmware-v4up.bin");
 
   delay(5000);
