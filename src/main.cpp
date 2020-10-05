@@ -25,6 +25,23 @@ String macStr;
 
 static const char *TAG = "co2fota";
 
+
+#define TRIANGLE(x1,y1,x2,y2 ,x3,y3) M5.Lcd.fillTriangle(pad+(x1),pad+(y1),pad+(x2),pad+(y2),pad+(x3),pad+(y3), WHITE)
+void drawM() {
+  
+  const int pad=4;
+  const int my = M5.Lcd.height()-pad*2;
+  const int mx = M5.Lcd.width()-pad*2;
+
+ 
+  TRIANGLE(0,my/2,mx/2,my/2,mx/4, 0); // ▲ Links
+  TRIANGLE(mx/2,my/2,mx/2+mx/4,0,mx, my/2); // ▲ Rechts
+  TRIANGLE(0,my/2,mx/8,my-my/4, mx/4,my/2); // ▾ Links
+  TRIANGLE(mx-(mx/4),my/2,mx,my/2,mx-(mx/8),my-my/4); // ▾ Rechts
+  TRIANGLE(mx/4,my/2,mx/2,my, mx-(mx/4),my/2); // ▼
+
+}
+
 void setup()
 {
 
@@ -34,6 +51,9 @@ void setup()
 
   delay(1250);
   M5.begin();
+  M5.Lcd.fillScreen(BLACK);
+  drawM();
+  delay(3000);
   M5.Lcd.fillScreen(BLACK);
   M5.Lcd.setCursor(0, 0,2);
   M5.Lcd.setTextSize(1);
@@ -77,7 +97,7 @@ void setup()
   delay(5000);
 }
 
-void pollFOTAUpdate(String host, int port, String uri)
+void pollFOTAUpdate(String host, int port, String uriBase)
 {
   static long int lastPoll = 0;
   const int _ota_timeout = 10000;
@@ -88,10 +108,9 @@ void pollFOTAUpdate(String host, int port, String uri)
   // Variables to validate firmware content
   volatile int contentLength = 0;
 
-  //String base = "https://co2ampel.kgbvax.net/firmware.bin";
-
-  Serial.println("poll " + host + " - " + uri);
-  http.begin(cl, host, port, uri, true);
+ 
+  Serial.println("poll " + host + " - " + uriBase);
+  http.begin(cl, host, port, uriBase+macStr+"/fw", true);
 
   //    http.setTimeout(2000);
   int httpStatus = http.GET();
@@ -104,18 +123,7 @@ void pollFOTAUpdate(String host, int port, String uri)
     {
       Serial.println("Starting Over-The-Air update. This may take some time to complete ...");
 
-      /*
-      size_t written = Update.writeStream(cl);
-       
-      if (written == contentLength)
-      {
-        Serial.println("Written : " + String(written) + " successfully");
-      }
-      else
-      {
-        Serial.println("Written only : " + String(written) + "/" + String(contentLength) + ". Retry?");
-        // Retry??
-      } */
+      
       uint32_t written = 0, total = 0, tried = 0;
 
       while (!Update.isFinished() && cl.connected())
